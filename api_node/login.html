@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>login</title>
 
+
+
+  	<link rel="stylesheet" href="./resource/layui/css/layui.css" media="all">
+  	<link rel="stylesheet" href="./resource/style/admin.css" media="all">
+  	<link rel="stylesheet" href="./resource/style/login.css" media="all">
     <script type="text/javascript" src="./resource/js/jquery.min.js"></script>
     <script type="text/javascript" src="./resource/layer/layer.js"></script>
 </head>
@@ -34,35 +39,51 @@
 					},
 					dataType:"json",
 					success:function(res){
-						layer.msg(res.msg)
+						layer.msg(res.msg,{icon: 1})
 					},
 					error:function(e){
-						 // console.log(e.status);
-       					//console.log(e.responseText);
-						// alert('请求出错')
+						layer.alert('请求出错')
 					}
 				})
 			})
 			//注册
 			$('#register').click(function () {
-				$.ajax({
-					type :"POST",
-					url:'http://localhost:8080/register',
-					data:{
-						username:$('#username').val(),
-						pwd:$('#pwd').val()
-					},
-					dataType:"json",
-					success :function(res){
-						alert(res.msg)
-					},
-					error :function(e){
-						console.log(e.status);
-                		console.log(e.responseText);
-						// alert('请求出错')
-					}
-				})
+				var bool = check();
+				if(!bool){
+					return false;
+				}else{
+					$.ajax({
+						type :"POST",
+						url:'http://localhost:8080/register',
+						data:{
+							username:$('#username').val(),
+							pwd:$('#pwd').val()
+						},
+						dataType:"json",
+						success :function(res){
+							layer.alert(res.msg)
+						},
+						error :function(e){
+							layer.alert('请求出错')
+						}
+					})
+				}
+				
 			})
+			function check(){
+				var username = $('#username').val();
+				var pwd = $('#pwd').val();
+				// console.log(username);
+				if(username == ''){
+					layer.alert('用户名不能为空！');
+					return false;
+				}else if (pwd == ''){
+					layer.alert('密码不能为空！');
+					return false;
+				}else{
+					return true;
+				}
+			}
 		</script>
 </body>
 </html>
