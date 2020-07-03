@@ -70,7 +70,24 @@
 		```
 
 	4. mysql --> 结构化数据库 中 的一种 --> 服务 ，提供了数据存放的服务
+
 		 数据库 字符集 utf8mb4 排序规则 utf8mb4_croatian_ci
+		 config/config.json 内容
+		 	```
+		 	  "development": {
+			    "username": "root",
+			    "password": "root",
+			    "database": "node",
+			    "host": "127.0.0.1",
+			    "dialect": "mysql",
+			    // 使用不同的存储类型. Default: sequelize
+			    "migrationStorage": "json",
+			    // 使用不同的文件名. Default: sequelize-meta.json
+			    "migrationStoragePath": "sequelizeMeta.json",
+			    // 使用不同的表名. Default: SequelizeMeta
+			    "migrationStorageTableName": "sequelize_meta"
+			  }
+		 	```
 		* 数据库： 划分的存储区域
 		* table:
 			js对象数组
@@ -78,9 +95,12 @@
 				{id；1,name:'计算机编程'},
 				{id:2,'name':'c++'},
 			]
-	5. sequelize 介绍和使用
+	5. sequelize 介绍和使用 
+		node-application --> ORM(sequelize) --> 驱动（node-mysql)-->mysql(db)
 		安装 npm i sequelize   初始化 npx sequelize-cli init 在应用中 会生成 config migrations models seeders 文件夹
-
+		<!-- 安装 mysql 依赖 -->
+		npm install mysql2 
 		* 什么是 ORM
+			
 		* Sequelize 作用
 		* 在node.js 应用中集成 Sequelize

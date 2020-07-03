@@ -1,67 +1,140 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+
+
+
+const models = require('../models');
+
+// {
+// 	[model:Todo],
+// 	sequelize,
+// 	Sequelize
+// }
 
 //是一个 express 实例
 
 const app = express();
+
 const userRouter = require('./router/user_router');
 
-// 中间件完整的结构
-// 1.是一个函数
-// 2.err,req,res,next-->function
+app.use(express.json());
+//for parsing applcation/xwww-form-urlencoded
+app.use(express.urlencoded());
 
 
-function log_middleware(req , res ,next){
-	console.log('request come ...');
-	next()
-}
-app.use(log_middleware);
-app.use('/user' , userRouter);
+// for parsing application/xwww-from-urlencoded
+app.use(bodyParser.urlencoded({extended:true}));
 
 
-app.get('/test' , (req , res)=>{
-	throw new Error('测试异常');
+//1. 所有的错误 ，http status = 500
 
-})
-function demo_middleware(req ,res ,next){
+
+/** 查询任务列表*/
+app.get('/list/:status/:page' , async (req , res , next)=>{
+	let list = await models.Todo.findAll();
+	res.json({
+		list
+	})
+});
+/**创建 一个 任务 */
+app.post('/create' , async (req , res , next)=>{
 	try{
-
-		//mysql 操作
-	}catch(error){
-		next(error);
-	}
-
-	// Promise.then().catch(next)
-
-}
-
-// tips: 异常处理 一定是 收口的。
-
-//异常 处理 函数
-function error_handler_middleware(err , req ,res ,next){
-	if(err){
-		let {message} = err;
-		res.status(500); 
+		let {name,deadline,content} = req.body;
+		let todo = await models.Todo.create({
+			name,
+			deadline,
+			content
+		})
 		res.json({
-			message:`${message || '服务器异常'}`,
+			message:'创建成功',
+			todo
+		})
+
+	}catch(error){
+		next(error)
+	}
+	
+});
+/**编辑 一个 任务 */
+app.post('/update' , async (req , res , next)=>{
+	try{
+		let {name,deadline,content,id} = req.body;
+		let todo = await models.Todo.findOne({
+			where:{
+				id
+			}
+		})
+		if(todo){
+			let todo =todo.update({
+				name,deadline,content
+			})
+			res.json({
+				message:'编辑成功',
+				todo
+			})
+		}else{
+			res.json({
+				message:'没有该记录',
+				todo
+			})
+		}
+
+	}catch(error){
+		next(error)
+	}	
+	
+});
+/** 修改状态 删除*/
+app.post('/update_status' , async (req , res , next)=>{
+	let {id,status} = req.body;
+	let todo = await models.Todo.findOne({
+		where:{
+			id
+		}
+	})
+	if(todo){
+		let todo =todo.update({
+			status
+		})
+		res.json({
+			message:'状态修改成功',
+			todo
 		})
 	}else{
-		next();
+		res.json({
+			message:'没有该记录',
+			todo
+		})
 	}
-}
+	// res.json({
+	// 	message:'修改状态成功',
+	// 	todo,
+	// 	id
+	// })
+});
 
-function not_fount_handler(req , res , next){
+app.get('/detail/:id' , async (req , res)=>{
+	let {id} = req.params;
+    let user = await models.User.findOne({
+    	where:{
+    		id
+    	}
+    });
 	res.json({
-		message:'api 不存在',
+		user
 	})
-}
-app.use(not_fount_handler);
-app.use(error_handler_middleware);
-// 加载 一个 static 的 中间件
-app.use(express.static('static' , {
-	//设置 后缀
-	extensions:['html','htm'],
-}));
+});
 
+
+
+app.use((err , req , res , next)=>{
+	if(err){
+		res.status(500).json({
+			message:err.message
+
+		})
+	}
+});
 
 
 
