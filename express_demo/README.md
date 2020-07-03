@@ -1,6 +1,5 @@
 # 介绍
-
-
+	<!-- 范例 https://github.com/life2022/Node_Forum/tree/master/blog_gyji -->
 	config //数据库配置目录
 	migratons //数据库迁移
 	models //所有模型
