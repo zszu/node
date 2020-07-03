@@ -7,6 +7,8 @@
 	seeders //包含所有种子文件
 	models //src 应用目录
 	static //前端页面
+# 安装 依赖
+	npm i express nodemon sequelize sequelize-cli mysql2
 
 	
 ## 需求说明 , API 说明
