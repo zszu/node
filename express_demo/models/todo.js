@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   Todo.init({
     name: DataTypes.STRING,
     deadline: DataTypes.DATE,
-    content: DataTypes.STRING
+    content: DataTypes.STRING,
+    status: {
+      type:DataTypes.INTEGER,
+      defaultValue:1
+    }
   }, {
     sequelize,
     modelName: 'Todo',

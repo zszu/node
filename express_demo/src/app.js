@@ -31,8 +31,22 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 /** 查询任务列表*/
 app.get('/list/:status/:page' , async (req , res , next)=>{
-	let list = await models.Todo.findAll();
+	// 1.状态 0:待办 ， 1:完成 ， -1:删除 , 2:全部
+	// 2.分页的处理
+	let {status,page} = req.params;
+	let limit = 10;
+	let offset = (page-1)*limit;
+	let where = {};
+	if(status != 2){
+		where.status = status;
+	}
+	let list = await models.Todo.findAndCountAll({
+		where,
+		limit,
+		offset
+	});
 	res.json({
+		message:'列表查询成功',
 		list
 	})
 });
@@ -65,7 +79,7 @@ app.post('/update' , async (req , res , next)=>{
 			}
 		})
 		if(todo){
-			let todo =todo.update({
+			todo = await todo.update({
 				name,deadline,content
 			})
 			res.json({
@@ -92,8 +106,9 @@ app.post('/update_status' , async (req , res , next)=>{
 			id
 		}
 	})
-	if(todo){
-		let todo =todo.update({
+	// console.log(status !== todo.status)
+	if(todo && status !== todo.status){
+		todo = await todo.update({
 			status
 		})
 		res.json({
@@ -106,23 +121,60 @@ app.post('/update_status' , async (req , res , next)=>{
 			todo
 		})
 	}
-	// res.json({
-	// 	message:'修改状态成功',
-	// 	todo,
-	// 	id
-	// })
-});
 
+});
+/** 删除任务*/
+app.get('/delete/:id' , async(req , res , next)=>{
+	let {id} = req.params;
+
+	let todo = await models.Todo.findOne({
+		where:{
+			id
+		}
+	})
+	if(todo){
+		todo = await todo.destroy({
+			where:{
+				id
+			}
+		});
+		res.json({
+			message:'删除成功',
+			id
+		})
+	}else{
+		res.json({
+			message:'没有该记录',
+			id
+		})
+	}
+
+
+
+	
+
+})
+
+/** 根据 id 查询记录*/
 app.get('/detail/:id' , async (req , res)=>{
 	let {id} = req.params;
-    let user = await models.User.findOne({
+    let todo = await models.Todo.findOne({
     	where:{
     		id
     	}
     });
-	res.json({
-		user
-	})
+    if(todo){
+    	res.json({
+			message:'查询成功',
+			todo
+		})
+    }else{
+    	res.json({
+			message:'没有该记录',
+			id
+		})
+    }
+	
 });
 
 
